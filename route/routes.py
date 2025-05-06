@@ -41,7 +41,7 @@ class RegisterRequest(BaseModel):
     filename: str # Se valida automáticamente que filename exista y sea una cadena
 
 # Ruta para eliminar el archivo
-@route.post('/deletefile/')
+@router.post('/deletefile/')
 def delete_file(request: RegisterRequest, authorization: str = Header(...)):
     try:
         if not isinstance(authorization, str) or not authorization.startswith('Bearer '):
@@ -62,7 +62,7 @@ def delete_file(request: RegisterRequest, authorization: str = Header(...)):
         return {'message': f'Error al eliminar el archivo: {str(e)}'}
 
 # Ruta para cargar el archivo
-@route.post('/loadfile/')
+@router.post('/loadfile/')
 def load_file(request: RegisterRequest, authorization: str = Header(...)):
     try:
         if not isinstance(authorization, str) or not authorization.startswith('Bearer '):

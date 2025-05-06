@@ -19,21 +19,21 @@ class Blockchain:
             # Obteniendo el hash del último bloque registrado en la BD NoSQL
             previous_hash = self.get_previous_hash()
             if previous_hash is None:
-                return {'message': 'Error: No se puedo obtener el hash del último bloque'}
+                return self.error_handle.manejar_error(Exception('No se pudo obtener el hash del último bloque'), levantar=False)
 
             # Verificando la integridad del último bloque en la BD NoSQL
             if not self.db_sql.ultimo_hash(previous_hash):
-                return {'message': 'Error: La integridad del último bloque está comprometida'}
+                return self.error_handle.manejar_error(Exception('La integridad del último bloque está comprometida'), levantar=False)
 
             # Obtener la prueba de autoridad (PoA)
             proof_data = self.proof_of_authority(previous_hash, private_key)
             if 'message' in proof_data:
-                return proof_data # Error si la clave privada no es del servidor
+                return self.error_handle.manejar_error(Exception(proof_data['message']), levantar=False) # Error si la clave privada no es del servidor
 
             # Obteniendo el ultimo index
             index = self.db_nosql.get_last_index()
             if index is None:
-                return {'message': 'Error: No se pudo obtener el índice del último bloque'}
+                return self.error_handle.manejar_error(Exception('No se pudo obtener el índice del último bloque'), levantar=False)
             index += 1
 
             # Construcción del bloque
@@ -58,7 +58,7 @@ class Blockchain:
             # Guarda el bloque en la BD NoSQL
             id_block = self.db_nosql.save_block(block)
             if id_block is None:
-                return {'message': 'Error: No se pudo guarda el bloque en la BD NoSQL'}
+                return self.error_handle.manejar_error(Exception('No se pudo guarda el bloque en la BD NoSQL'), levantar=False)
 
             # Guardar el hash en la BD SQL
             self.db_sql.save_hash_file(block['hash'], file_hash, metadatos['file_id'], id_block, metadatos['nombre'])
@@ -80,7 +80,7 @@ class Blockchain:
 
             # Verificar que la clave corresponde al servidor (único validador)
             if server_public_key != self.authentication.get_server_public_key():
-                return {'message': 'Error: Clave privada incorrecta para validación'}
+                return self.error_handle.manejar_error(Exception('Clave privada incorrecta para validación'), levantar=False)
 
             # Firmar el previous_proof con la clave privada del servidor
             proof = self.authentication.sign_proof(previous_proof, private_key)
@@ -91,5 +91,5 @@ class Blockchain:
             return {'message': f'Error en el PoA: {str(e)}'}
 
     def hash(self, block):
-        encoded_block = json.dump(block, sort_keys=True).encode()
+        encoded_block = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
