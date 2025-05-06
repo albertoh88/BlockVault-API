@@ -115,6 +115,3 @@ class TestBlockchain(unittest.TestCase):
 
             for key in expected_keys:
                 self.assertIn(key, save_block)
-
-if __name__ == '__main__':
-    unittest.main()
