@@ -35,12 +35,15 @@ class Nosql:
             collection = db['mi_coleccion']
 
             # Obtener el último registro insertado
-            ultimo_bloque = collection.find().sort([('$natural', -1)]).limit(1)
+            ultimo_bloque_cursor = collection.find().sort([('$natural', -1)]).limit(1)
+            ultimo_bloque = list(ultimo_bloque_cursor)
 
             # Obteniendo el previous_hash del último bloque
-            previous_hash = ultimo_bloque[0]['previous_hash']
-
-            return previous_hash
+            if ultimo_bloque:
+                previous_hash = ultimo_bloque[0]['previous_hash']
+                return previous_hash
+            else:
+                return None
 
         except Exception as e:
             self.error_handle.manejar_error(e)

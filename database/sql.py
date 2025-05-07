@@ -70,8 +70,8 @@ class Sql:
             cursor.execute('SELECT @idfile, @message;')
             result = cursor.fetchone()
 
-            file_id = result[1]
-            message = result[0]
+            file_id = result[0]
+            message = result[1]
 
             return file_id
 
