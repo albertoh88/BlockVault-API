@@ -17,4 +17,4 @@ class Services:
         except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError, jwt.DecodeError) as e:
             self.error_handle.manejar_error(e)
         except Exception as e:
-            self.error_handle.manejar_error(e)
+            return self.error_handle.manejar_error(Exception(f'Error genérico: {str(e)}'), levantar=False)

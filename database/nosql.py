@@ -72,7 +72,7 @@ class Nosql:
             db = cliente['mi_base-datos-blockchain']
             collection = db['registros_block']
 
-            last_block = collection.fine_one({}, sort=[('index', -1)]) # Obtener el bloque con el mayor indice
+            last_block = collection.find_one({}, sort=[('index', -1)]) # Obtener el bloque con el mayor indice
             return last_block['index'] if last_block else 0 # Si no hay bloque, retorna 0
 
         except Exception as e:
@@ -104,13 +104,13 @@ class Nosql:
                 cliente.close()
 
     def delete_file(self, file_id):
-        cliente = None # Previene errores en finally di falla la conexión
+        cliente = None # Previene errores en finally si falla la conexión
 
         try:
             cliente = self.conect.connection_nosql()
             fs = gridfs.GridFS(cliente['mi_base_de_datos_file'])
 
-            if not fs.exists(file_id):
+            if not fs.exists({'_id': file_id}):
                 return {'message': 'El archivo no existe'}
 
             fs.delete(file_id)
