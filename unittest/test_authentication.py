@@ -56,18 +56,14 @@ class TestAuthentication(unittest.TestCase):
         # Convertimos el bloque a JSON para verificar la firma
         block_string = json.dumps(block, sort_keys=True).encode()
 
-        try:
-            self.public_key.verify(
+        self.public_key.verify(
                 signature,
                 block_string,
                 padding.PKCS1v15(),
                 hashes.SHA256()
             )
-            valid = True
-        except Exception:
-            valid = False
 
-        self.assertTrue(valid, 'La firma generada no es valida')
+        self.assertTrue(True)
 
     def test_sign_block_invalid_signature(self):
         # Verifica que la firma falle con una clave incorrecta.

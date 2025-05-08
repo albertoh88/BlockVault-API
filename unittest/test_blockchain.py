@@ -15,6 +15,59 @@ class TestBlockchain(unittest.TestCase):
             side_effect=lambda e, levantar=True: {'status': 400, 'detail': str(e)}
         )
 
+    def test_save_block_error(self):
+
+        self.blockchain.proof_of_authority = MagicMock()
+        self.blockchain.hash = MagicMock()
+
+        self.blockchain.db_nosql.save_block.return_value = None
+        self.blockchain.db_nosql.get_last_index.return_value = 1
+
+        self.blockchain.authentication.get_public_key.return_value = 'server_pub_key'
+        self.blockchain.authentication.get_server_public_key.return_value = 'server_pub_key'
+        self.blockchain.authentication.sign_proof.return_value = 'sing_proof'
+        self.blockchain.authentication.sign_block.return_value = 'block_signature'
+        self.blockchain.hash.return_value = 'block_hash'
+        self.blockchain.proof_of_authority.return_value = {'proof': 'proof_value', 'validator': 'validator'}
+
+        self.blockchain.db_sql.ultimo_hash.return_value = True
+
+        result = self.blockchain.create_block('test_file_hash', {'file_id': 1, 'nombre': 'test_file'}, 'private_key')
+
+        self.blockchain.error_handle.manejar_error.assert_called_once()
+        self.assertEqual(result, {'detail': "No se pudo guarda el bloque en la BD NoSQL", 'status': 400})
+
+    def test_create_block_exception(self):
+        self.blockchain.db_nosql.get_last_index.return_value = True
+
+        self.blockchain.authentication.get_public_key.return_value = 'server_pub_key'
+        self.blockchain.authentication.get_server_public_key.return_value = 'server_pub_key'
+        self.blockchain.authentication.sign_proof.return_value = 'sign_proof'
+        self.blockchain.proof_of_authority('previous_proof', 'private_key')
+
+        self.blockchain.db_sql.ultimo_hash.return_value = True
+
+        result = self.blockchain.create_block('test_file_hash', {'file_id': 1, 'nombre': 'test_file'}, 'private_key')
+
+        self.blockchain.error_handle.manejar_error.assert_called_once()
+        self.assertEqual(result, {'message': "Error al agregar el bloque: 'validator'"})
+
+    def test_get_last_index_error(self):
+
+        self.blockchain.db_nosql.get_last_index.return_value = None
+
+        self.blockchain.authentication.get_public_key.return_value = 'server_pub_key'
+        self.blockchain.authentication.get_server_public_key.return_value = 'server_pub_key'
+        self.blockchain.authentication.sign_proof.return_value = 'sign_proof'
+        self.blockchain.proof_of_authority('previous_proof', 'private_key')
+
+        self.blockchain.db_sql.ultimo_hash.return_value = True
+
+        result = self.blockchain.create_block('test_file_hash', {'file_id': 1, 'nombre': 'test_file'}, 'private_key')
+
+        self.blockchain.error_handle.manejar_error.assert_called_once()
+        self.assertEqual(result, {'detail': 'No se pudo obtener el índice del último bloque', 'status': 400})
+
     def test_get_previous_hash_success(self):
         self.blockchain.db_nosql.ultimo_registro.return_value = 'sbc123'
         result = self.blockchain.get_previous_hash()
