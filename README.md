@@ -124,4 +124,4 @@ Documentação OpenAPI: O FastAPI gera automaticamente uma interface interativa 
 Não se esqueça de rodar o servidor com uvicorn app:app --reload se for usar o Uvicorn diretamente.
 
 # 📃 Licença
-Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para mais informações.
+Este projeto está sob a licença MIT. Consulte o arquivo [Licença MIT](https://opensource.org/licenses/MIT) para mais informações.
