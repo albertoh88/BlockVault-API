@@ -64,7 +64,7 @@ class Sql:
 
             # Llamamos al procedimiento para extraer el id
             query = 'CALL file_id(%s, @idfile, @message);'
-            cursor.execute(query, (file_name))
+            cursor.execute(query, (file_name,))
 
             # Recuperando las variables de salida
             cursor.execute('SELECT @idfile, @message;')
